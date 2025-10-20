@@ -1,0 +1,36 @@
+{
+    "name": "tcytra/enraiged-forms",
+    "description": "Enraiged Forms provides form handling features for Laravel Enraiged projects.",
+    "keywords": ["forms", "enraiged"],
+    "homepage": "https://github.com/tcytra/enraiged-core",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Todd Cytra",
+            "email": "tcytra@gmail.com"
+        }
+    ],
+    "require": {
+        "laravel/framework": "^12.0",
+        "tcytra/enraiged-support": "^0.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Enraiged\\Forms\\": "src/"
+        }
+    },
+    "scripts": {
+        "post-update-cmd": [
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Enraiged\\Forms\\FormsServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
