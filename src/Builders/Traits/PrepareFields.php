@@ -283,13 +283,7 @@ trait PrepareFields
 
             if ($config->type === 'enum') {
                 if ($source) {
-                    $values = collect($source::cases())
-                        ->transform(fn ($option)
-                            => [
-                                'id' => $option->name,
-                                'name' => $option->value,
-                            ])
-                        ->toArray();
+                    $values = $source::options();
                 } else {
                     logger("An enum source was not provided for the {$source} options", collect($config)->toArray());
                 }
