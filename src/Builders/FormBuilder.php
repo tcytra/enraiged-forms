@@ -2,6 +2,7 @@
 
 namespace Enraiged\Forms\Builders;
 
+use Enraiged\Builders\Secure\AssertSecure;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -12,10 +13,9 @@ abstract class FormBuilder
         Traits\FormActions,
         Traits\FormFields,
         Traits\FormModel,
-        Traits\HttpRequest,
         Traits\PrepareFields,
         Traits\SanityChecks,
-        Traits\SecurityAssertions;
+        AssertSecure;
 
     /**
      *  Return a form builder instance for 'create' from a model and resource definitions.

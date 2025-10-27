@@ -15,6 +15,12 @@ trait BuilderConstructor
     /** @var  object  The templated form labels direction. */
     protected $labels;
 
+    /** @var  string  The initial request http_referer. */
+    protected $referer;
+
+    /** @var  object  The http request. */
+    protected $request;
+
     /** @var  object  The form action configuration. */
     protected $resource;
 
@@ -82,5 +88,15 @@ trait BuilderConstructor
         }
 
         return null;
+    }
+
+    /**
+     *  Return the request.
+     *
+     *  @return \Illuminate\Http\Request
+     */
+    public function request()
+    {
+        return $this->request;
     }
 }

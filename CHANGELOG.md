@@ -1,4 +1,4 @@
 # Release Notes
 
-2025-03-27 : 0.4.0-beta.1 (prerelease)  
+2025-03-27 : 0.3.19  
 Update: Completed assembling initial enraiged-forms library
