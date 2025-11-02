@@ -117,7 +117,7 @@ trait PrepareFields
                 $config = (object) $field->options;
                 $source = property_exists($field, 'source') ?? $name;
 
-                $this->field($name, ['options' => $this->selectOptions($source, $config)]);
+                $this->field($name, ['options' => $this->selectOptions($config)]);
 
                 $field = (object) $this->field($name);
             }
@@ -239,12 +239,11 @@ trait PrepareFields
     /**
      *  Retrieve and return a set of select options.
      *
-     *  @param  string  $source
      *  @param  array|object  $config
      *  @param  bool    $select = true
      *  @return array
      */
-    protected function selectOptions($source, $config, $select = true): array
+    protected function selectOptions($config, $select = true): array
     {
         $config = (object) $config;
         $source = property_exists($config, 'source') ? $config->source : null;
@@ -254,18 +253,26 @@ trait PrepareFields
             return ['values' => $values];
         }
 
-        if ($source === 'api') { // todo: should api be the 'type' and not the 'source'? add a 'method' type?
-            dd('stop...');
-            $uri = preg_match('/\./', $config->uri)
-                ? $this->route($config->uri)
-                : $config->uri;
+        if (property_exists($config, 'route')) {
+            if (gettype($config->route) === 'string') {
+                $config->route = (object) ['name' => $config->route];
+            }
 
-            return collect($config)
-                ->merge([
-                    'uri' => $uri,
-                    'values' => [],
-                ])
-                ->toArray();
+            if (!property_exists($config->route, 'params')) {
+                $config->route->params = $this->request()->route()->hasParameters()
+                    ? $this->request()->route()->parameters()
+                    : [];
+            }
+
+            if (!property_exists($config->route, 'url')) {
+                $config->route->url = route(
+                    $config->route->name,
+                    $config->route->params,
+                    config('enraiged.app.absolute_uris')
+                );
+            }
+
+            $source = $config->source = 'api';
         }
 
         if ($select === true) {
