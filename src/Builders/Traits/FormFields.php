@@ -234,7 +234,7 @@ trait FormFields
      *  @param  array|null  $fields = null
      *  @return array|self
      */
-    public function fields(array $fields = null)
+    public function fields(?array $fields = null)
     {
         if ($fields) {
             $this->fields = $fields;
