@@ -16,7 +16,7 @@ trait FormActions
      *  @param  bool|null   $merge = false
      *  @return array|self
      */
-    public function actions(array $actions = null, bool $merge = false)
+    public function actions(?array $actions = null, bool $merge = false)
     {
         if ($actions) {
             $this->actions = $merge
@@ -52,7 +52,7 @@ trait FormActions
      *  @param  bool|null   $merge = false
      *  @return $this
      */
-    protected function prepareActions(array $actions = null, bool $merge = false)
+    protected function prepareActions(?array $actions = null, bool $merge = false)
     {
         if ($actions) {
             $this->actions($actions, $merge);

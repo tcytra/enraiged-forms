@@ -124,7 +124,7 @@ trait FormFields
      *
      *  @todo   This handles sections now also.. rename from field() to object() (or something?)
      */
-    public function field($name, $params = null, $rewrite = false, $depth = [])
+    public function field($name, ?array $params = null, $rewrite = false, $depth = [])
     {
         $fields = &$this->fields;
 
