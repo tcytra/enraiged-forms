@@ -115,7 +115,7 @@ trait PrepareFields
 
             if (!property_exists($field, 'values')) {
                 $config = (object) $field->options;
-                $source = property_exists($field, 'source') ?? $name;
+                //$source = property_exists($field, 'source') ?? $name;
 
                 $this->field($name, ['options' => $this->selectOptions($config)]);
 
@@ -153,11 +153,11 @@ trait PrepareFields
                     $model = $model->{$relative};
                 }
 
-                if (!is_null($model) && $model->getAttribute($attribute)) {
+                if (!is_null($model) && $model->hasAttribute($attribute)) {
                     $value = $model->{$attribute};
                 }
 
-            } else if ($this->model && !is_null($this->model->getAttribute($name))) {
+            } else if ($this->model->exists && $this->model->hasAttribute($name)) {
                 $value = $this->model->getAttribute($name);
             }
         }
