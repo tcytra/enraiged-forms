@@ -8,20 +8,6 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 trait SanityChecks
 {
     /**
-     *  Determine if a field allows populating values.
-     *
-     *  @param  array|object  $field
-     *  @return bool
-     *
-    protected function canPopulateValues($field): bool
-    {
-        $object = (object) $field;
-
-        return !property_exists($object, 'value')
-            || $object->value !== false;
-    }*/
-
-    /**
      *  Determine if the provided route is defined.
      *
      *  @param  string  $route

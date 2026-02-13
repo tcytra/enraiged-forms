@@ -117,12 +117,12 @@ trait FormFields
      *  Get or set a form field.
      *
      *  @param  string  $name
-     *  @param  array   $params = null
+     *  @param  array|null  $params = null
      *  @param  bool    $rewrite = false
      *  @param  array   $depth = []
      *  @return array|self
      *
-     *  @todo   This handles sections now also.. rename from field() to object() (or something?)
+     *  @todo   This handles sections now also.. rename from field() to object() or item() (or something?)
      */
     public function field($name, ?array $params = null, $rewrite = false, $depth = [])
     {
@@ -135,44 +135,63 @@ trait FormFields
         }
 
         if (gettype($fields) === 'array') {
-            if (key_exists($name, $fields)) {
-                $object = &$fields[$name];
+            $param = null;
 
-                if (!$this->assertSecure($object, $this->model)) {
+            if (preg_match('/::/', $name)) {
+                [$name, $param] = explode('::', $name);
+            }
+
+            if (key_exists($name, $fields)) {
+                $array = &$fields[$name];
+
+                if (!$this->assertSecure($array, $this->model)) {
                     unset($fields[$name]);
                 }
 
                 if ($params) {
                     //  if rewriting the field, the field is returned
                     if ($rewrite) {
-                        $fields[$name] = $params;
+                        if ($param) {
+                            $fields[$name][$param] = $params;
+                        } else {
+                            $fields[$name] = $params;
+                        }
 
                         return $fields[$name];
                     }
 
                     //  otherwise the builder instance is returned
-                    $fields[$name] = collect($fields[$name])
-                        ->merge($params)
-                        ->toArray();
+                    if ($param) {
+                        $fields[$name][$param] = collect($fields[$name][$param])
+                            ->merge($params)
+                            ->toArray();
+                    } else {
+                        $fields[$name] = collect($fields[$name])
+                            ->merge($params)
+                            ->toArray();
+                    }
 
                     return $this;
                 }
 
-                return $object;
+                return $param
+                    ? $array[$param]
+                    : $array;
             }
 
             $keys = array_keys($fields);
 
             foreach ($keys as $each) {
-                $object = $fields[$each];
+                $array = $fields[$each];
 
-                if ($this->hasSectionFields($object) || $this->hasTabbedFields($object)) {
-                    if (!$this->assertSecure($object, $this->model)) {
-                        unset($fields[$each]);
-                    }
+                if ($this->hasSectionFields($array) || $this->hasTabbedFields($array)) {
+                    $layers = collect($depth)
+                        ->merge($each)
+                        ->merge('fields');
 
-                    $layers = collect($depth)->merge($each)->merge('fields');
-                    $search = $this->field($name, $params, $rewrite, $layers->toArray());
+                    $search = $param
+                        ? $this->field("{$name}::{$param}", $params, $rewrite, $layers->toArray())
+                        : $this->field($name, $params, $rewrite, $layers->toArray());
 
                     if ($search) {
                         return $search;
@@ -383,9 +402,9 @@ trait FormFields
     {
         $populate = ['value' => $data];
 
-        if ($defer) {
-            $populate['populated'] = true;
-        }
+        //if ($defer) {
+        //    $populate['populated'] = true;
+        //}
 
         $this->field($name, $populate);
 

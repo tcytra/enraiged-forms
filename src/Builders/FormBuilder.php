@@ -12,6 +12,7 @@ abstract class FormBuilder
     use Traits\BuilderConstructor,
         Traits\FormActions,
         Traits\FormFields,
+        Traits\FormGroups,
         Traits\FormModel,
         Traits\PrepareFields,
         Traits\SanityChecks,
@@ -82,7 +83,7 @@ abstract class FormBuilder
                 'url' => route(
                     $this->route->getName(),
                     $this->route->parameters,
-                    config('enraiged.app.absolute_uris')
+                    config('enraiged.forms.absolute_uris')
                 ),
             ];
         }
@@ -97,11 +98,17 @@ abstract class FormBuilder
      */
     public function template(): array
     {
+        $actions = collect(['back', 'clear', 'reset'])
+            ->merge($this->resource ? $this->resource['action'] : [])
+            ->toArray();
+
         return [
             'actions' => collect($this->actions)
-                ->only(['back', 'clear', 'reset', $this->resource['action']])
+                ->only($actions)
                 ->transform(fn ($action, $index)
-                    => $index === $this->resource['action'] ? $this->resource : $action)
+                    => key_exists('action', $this->resource ?: []) && $index === $this->resource['action']
+                        ? $this->resource
+                        : $action)
                 ->toArray(),
             'class' => $this->class,
             'fields' => $this->fields,

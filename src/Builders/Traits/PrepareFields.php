@@ -19,13 +19,13 @@ trait PrepareFields
     }
 
     /**
-     *  Prepare a calendar field.
+     *  Prepare a datepicker field.
      *
      *  @param  string  $name
      *  @param  object  $object = null
      *  @return $this
      */
-    protected function prepareCalendarField($name, $object = null)
+    protected function prepareDatepickerField($name, $object = null)
     {
         $field = (object) ($object ?? $this->field($name));
         $format = $field->format ?? $field->format->dateFormat ?? 'yy-mm-dd';
@@ -53,10 +53,10 @@ trait PrepareFields
      *  Prepare a specified field.
      *
      *  @param  string  $name
-     *  @param  object  $field = null
+     *  @param  object  $field
      *  @return $this
      */
-    public function prepareField($name, $field = null)
+    public function prepareField(string $name, object $field)
     {
         if (gettype($name) === 'array') {
             foreach ($name as $each) {
@@ -66,7 +66,7 @@ trait PrepareFields
             return $this;
         }
 
-        $field = (object) ($field ?? $this->field($name));
+        $field = (object) ($field ?: $this->field($name));
         $value = property_exists($field, 'value') ? $field->value : null;
 
         //  handle the field disabled state, if necessary
@@ -78,9 +78,9 @@ trait PrepareFields
             $field = (object) $this->field($name, [...$this->field($name), 'type' => 'text'], true);
         }
 
-        //  prepare the calendar field options, if necessary
-        if ($field->type === 'calendar') {
-            $this->prepareCalendarField($name, $field);
+        //  prepare the datepicker field options, if necessary
+        if ($field->type === 'datepicker') {
+            $this->prepareDatepickerField($name, $field);
         }
 
         //  prepare the multiselect field
@@ -174,8 +174,8 @@ trait PrepareFields
             }
         }
 
-        //  ensure proper format of the calendar value, if necessary
-        if ($field->type === 'calendar' && !is_null($value)) {
+        //  ensure proper format of the datepicker value, if necessary
+        if ($field->type === 'datepicker' && !is_null($value)) {
             $format = $field->format ?? $field->format->dateFormat ?? 'yy-mm-dd';
             $value = datetime($value, dateformat_primevue_to_php($format));
         }
@@ -214,9 +214,10 @@ trait PrepareFields
      *  Cycle and prepare a group of fields
      *
      *  @param  array  $fields
+     *  @param  string|null  $name
      *  @return void
      */
-    protected function prepareFieldGroup($fields = null)
+    protected function prepareFieldGroup(array $fields, ?string $name = null)
     {
         $keys = array_keys($fields);
 
@@ -224,14 +225,18 @@ trait PrepareFields
             $object = (object) $this->field($name);
 
             if ($this->hasSectionFields($object) || $this->hasTabbedFields($object)) {
-                $this->prepareFieldGroup($object->fields);
-
-            //} else if ($this->canPopulateValues($object)) {
-            //    $this->prepareField($name, $object);
+                if (!$this->assertSecure($object, $this->model)) {
+                    $this->remove($name);
+                } else {
+                    $this->prepareFieldGroup($object->fields, $name);
+                }
 
             } else {
-                //$this->field($name, ['value' => null]);
-                $this->prepareField($name, $object);
+                if (!$this->assertSecure($object, $this->model)) {
+                    $this->remove($name);
+                } else {
+                    $this->prepareField($name, $object);
+                }
             }
         }
     }

@@ -52,6 +52,8 @@ trait BuilderConstructor
         if ($this->template && $template = $this->parse($this->template)) {
             $this->load($template);
         }
+
+        $this->prepare();
     }
 
     /**
@@ -68,7 +70,7 @@ trait BuilderConstructor
             }
         }
 
-        return $this->prepare();
+        return $this;
     }
 
     /**
