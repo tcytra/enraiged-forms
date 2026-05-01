@@ -1,5 +1,10 @@
 # Enraiged Forms Release Notes
 
+2026-05-01 : 0.3.20  
+Update: Stable release 0.3.20
+
+---
+
 2026-04-16 : 0.3.19.4  
 Minor: Updated composer to allow laravel/framework v12 or v13
 
