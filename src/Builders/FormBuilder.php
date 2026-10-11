@@ -56,14 +56,17 @@ abstract class FormBuilder
      */
     private function router(string $method, array $parameters = [])
     {
-        preg_match('/\{[a-z]+\}/', $this->route->uri, $matches);
+        preg_match_all('/\{[a-z]+\}/', $this->route->uri, $matches);
 
-        if (count($matches)) {
+        if (count($matches[0])) {
             if ($this->request()->route()->hasParameters()) {
                 $parameters = $this->request()->route()->parameters();
             }
 
-            $this->route->parameterNames = preg_replace('/[\{\}]/', '', $matches);
+            $this->route->parameterNames = collect($matches[0])
+                ->transform(fn ($match) => str_replace(['{', '}'], '', $match))
+                ->toArray();
+
             $this->route->parameters = collect($parameters)
                 ->only($this->route->parameterNames)
                 ->toArray();
@@ -83,7 +86,7 @@ abstract class FormBuilder
                 'url' => route(
                     $this->route->getName(),
                     $this->route->parameters,
-                    config('enraiged.forms.absolute_uris')
+                    config('enraiged.forms.absolute_uris') 
                 ),
             ];
         }
