@@ -54,7 +54,7 @@ abstract class FormBuilder
      *  @param  array   $parameters = []
      *  @return $this
      */
-    private function router(string $method, array $parameters = [])
+    protected function router(string $method, array $parameters = [])
     {
         preg_match_all('/\{[a-z]+\}/', $this->route->uri, $matches);
 
