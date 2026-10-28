@@ -95,13 +95,16 @@ trait PrepareFields
         }
 
         //  prepare the select field options, if necessary
-        if ($field->type === 'select') {
-            $config = [
-                ...$this->field($name),
-                'multiple' => property_exists($field, 'multiple') && $field->multiple === true,
-            ];
+        if (in_array($field->type, ['select', 'textselect'])) {
+            if ($field->type === 'select') {
+                $config = [
+                    ...$this->field($name),
+                    'multiple' => property_exists($field, 'multiple') && $field->multiple === true,
+                ];
 
-            $field = (object) $this->field($name, $config, true);
+                $field = (object) $this->field($name, $config, true);
+            }
+
             $options = (object) $field->options;
 
             if (!property_exists($options, 'label') || !property_exists($options, 'value')) {
