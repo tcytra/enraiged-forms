@@ -284,6 +284,75 @@ trait FormFields
     }
 
     /**
+     *  Explicity set the hidden attribute for a specified field or array of fields.
+     *
+     *  @param  array|string  $name
+     *  @return $this
+     */
+    public function hidden($name): self
+    {
+        if (gettype($name) === 'array') {
+            foreach ($name as $each) {
+                $this->hidden($each);
+            }
+        } else {
+            $this->field($name, ['hidden' => true]);
+        }
+
+        return $this;
+    }
+
+    /**
+     *  Explicity set the hidden attribute for a specified field to the provided condition.
+     *
+     *  @param  array|string  $field
+     *  @param  bool|\Closure $condition
+     *  @return $this
+     */
+    public function hiddenIf($field, $condition): self
+    {
+        if (gettype($field) === 'array') {
+            foreach ($field as $each) {
+                $this->hiddenIf($each, $condition);
+            }
+
+        } else {
+            if ($condition instanceof \Closure) {
+                $condition = $condition();
+            }
+
+            $this->field($field, ['hidden' => $condition]);
+        }
+
+        return $this;
+    }
+
+    /**
+     *  Explicity set the hidden attribute for a specified field to the inverse of the provided condition.
+     *
+     *  @param  array|string  $field
+     *  @param  bool|\Closure $condition
+     *  @return $this
+     */
+    public function hiddenUnless($field, $condition): self
+    {
+        if (gettype($field) === 'array') {
+            foreach ($field as $each) {
+                $this->hiddenUnless($each, $condition);
+            }
+
+        } else {
+            if ($condition instanceof \Closure) {
+                $condition = $condition();
+            }
+
+            $this->field($field, ['hidden' => !$condition]);
+        }
+
+        return $this;
+    }
+
+    /**
      *  Lock a dropdown field to a single option.
      *
      *  @param  string  $name
@@ -364,26 +433,32 @@ trait FormFields
     /**
      *  Remove a field from the builder.
      *
-     *  @param  string  $name
-     *  @param  bool|\Closure $condition
+     *  @param  arra|string  $field
      *  @return $this
      */
-    public function remove($name): self
+    public function remove($field): self
     {
-        $fields = &$this->fields;
+        if (gettype($field) === 'array') {
+            foreach ($field as $each) {
+                $this->remove($each);
+            }
 
-        foreach ($fields as $index => $value) {
-            if ($index === $name) {
-                unset($fields[$name]);
-                break;
-            }
-            if ($this->isFormSection($index) && key_exists($name, $fields[$index])) {
-                unset($fields[$index][$name]);
-                break;
-            }
-            if ($this->hasSectionFields($fields[$index]) && key_exists($name, $fields[$index]['fields'])) {
-                unset($fields[$index]['fields'][$name]);
-                break;
+        } else {
+            $fields = &$this->fields;
+
+            foreach ($fields as $index => $value) {
+                if ($index === $field) {
+                    unset($fields[$field]);
+                    break;
+                }
+                if ($this->isFormSection($index) && key_exists($field, $fields[$index])) {
+                    unset($fields[$index][$field]);
+                    break;
+                }
+                if ($this->hasSectionFields($fields[$index]) && key_exists($field, $fields[$index]['fields'])) {
+                    unset($fields[$index]['fields'][$field]);
+                    break;
+                }
             }
         }
 
